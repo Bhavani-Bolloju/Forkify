@@ -2,11 +2,10 @@
   "name": "forkify",
   "version": "1.0.0",
   "description": "forkify - recipe searching app",
-  "source": "/index.html",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "start": "parcel",
-    "build": "parcel build"
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   },
   "author": "Bhavani bolloju",
   "license": "ISC",
