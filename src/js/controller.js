@@ -1,4 +1,6 @@
 import icons from "../img/icons.svg";
+import "core.js/stable";
+import "regenerator-runtime/runtime";
 
 const recipeContainer = document.querySelector(".recipe");
 
@@ -174,10 +176,5 @@ const showRecipe = async function () {
     console.error(error.message);
   }
 };
-
-// showRecipe();
-
-// window.addEventListener("hashchange", showRecipe);
-// window.addEventListener("load", showRecipe);
 
 ["hashchange", "load"].forEach(ev => window.addEventListener(ev, showRecipe));

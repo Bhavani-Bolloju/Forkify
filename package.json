@@ -12,5 +12,9 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.10.3",
     "parcel": "latest"
+  },
+  "dependencies": {
+    "core.js": "^0.4.2",
+    "regenerator-runtime": "^0.14.0"
   }
 }
