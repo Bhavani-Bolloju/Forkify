@@ -2,8 +2,8 @@ import * as model from "./model.js";
 import recipeView from "./view/recipeView.js";
 import searchView from "./view/searchView.js";
 import resultsView from "./view/resultsView.js";
+import paginationView from "./view/paginationView.js";
 
-import icons from "../img/icons.svg";
 // import "core.js/stable";
 import "regenerator-runtime/runtime";
 
@@ -11,9 +11,9 @@ import "regenerator-runtime/runtime";
 
 ///////////////////////////////////////
 
-if (module.hot) {
-  module.hot.accept();
-}
+// if (module.hot) {
+//   module.hot.accept();
+// }
 
 const controlRecipes = async function () {
   const id = window.location.hash.slice(1);
@@ -44,13 +44,13 @@ const controlSearchResults = async function () {
     await model.loadSearchResults(query);
     //render search results
 
-    const result = model.state.search.results.slice(0, 10);
+    const result = model.getSearchResultsPage(1);
 
     if (result.length <= 0) {
       throw new Error("No results found, try with different keyword");
     }
     resultsView.render(result);
-    //clear query input
+    paginationView.render(model.state.search);
     searchView.clearSearchInput();
   } catch (error) {
     resultsView.renderError(error.message);
@@ -59,8 +59,15 @@ const controlSearchResults = async function () {
 
 // controlSearchResults();
 
+const controlPagination = function (page) {
+  const result = model.getSearchResultsPage(page);
+  resultsView.render(result);
+  paginationView.render(model.state.search);
+};
+
 const init = function () {
   recipeView.handlerRender(controlRecipes);
   searchView.handlerSearchResult(controlSearchResults);
+  paginationView.addHandleClick(controlPagination);
 };
 init();
