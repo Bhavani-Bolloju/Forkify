@@ -1,5 +1,4 @@
 import View from "./view";
-import icons from "../../img/icons.svg";
 
 class ResultsView extends View {
   _parentEl = document.querySelector(".results");
@@ -9,7 +8,7 @@ class ResultsView extends View {
       .map(recipe => {
         return `
          <li class="preview">
-            <a class="preview__link preview__link--active" href="#${recipe.id}">
+            <a class="preview__link " href="#${recipe.id}">
               <figure class="preview__fig">
                 <img src="${recipe.image}" alt="${recipe.title}" />
               </figure>
@@ -20,7 +19,6 @@ class ResultsView extends View {
               </div>
             </a>
           </li>
-        
         `;
       })
       .join("");
