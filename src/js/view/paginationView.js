@@ -1,3 +1,5 @@
+import { RESULT_PER_PAGE } from "../config";
+
 class PaginationView {
   _parentEl = document.querySelector(".pagination");
   _btnPrev = document.querySelector(".pagination__btn--prev");
@@ -7,8 +9,9 @@ class PaginationView {
 
   render(totalresults) {
     const totalRecipeItems = totalresults.results;
+
     this._currentPage = totalresults.page;
-    this._totalPages = Math.ceil(totalRecipeItems.length / 10);
+    this._totalPages = Math.ceil(totalRecipeItems.length / RESULT_PER_PAGE);
     this._controlPageButtons(this._currentPage, this._totalPages);
   }
 

@@ -45,7 +45,6 @@ const controlSearchResults = async function () {
     //render search results
 
     const result = model.getSearchResultsPage(1);
-
     if (result.length <= 0) {
       throw new Error("No results found, try with different keyword");
     }

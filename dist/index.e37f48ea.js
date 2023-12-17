@@ -638,7 +638,7 @@ const init = function() {
 };
 init();
 
-},{"./model.js":"Y4A21","./view/recipeView.js":"7Olh7","./view/searchView.js":"blwqv","./view/resultsView.js":"46Nfk","regenerator-runtime/runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./view/paginationView.js":"9Reww"}],"Y4A21":[function(require,module,exports) {
+},{"./model.js":"Y4A21","./view/recipeView.js":"7Olh7","./view/searchView.js":"blwqv","./view/resultsView.js":"46Nfk","./view/paginationView.js":"9Reww","regenerator-runtime/runtime":"dXNgZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"Y4A21":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "state", ()=>state);
@@ -691,8 +691,8 @@ const loadSearchResults = async function(query) {
 };
 const getSearchResultsPage = function(page = state.search.page) {
     state.search.page = page;
-    const begin = (page - 1) * 10;
-    const end = page * 10;
+    const begin = (page - 1) * (0, _config.RESULT_PER_PAGE);
+    const end = page * (0, _config.RESULT_PER_PAGE);
     return state.search.results.slice(begin, end);
 };
 
@@ -701,8 +701,10 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "API_URL", ()=>API_URL);
 parcelHelpers.export(exports, "TIMEOUT_SECS", ()=>TIMEOUT_SECS);
+parcelHelpers.export(exports, "RESULT_PER_PAGE", ()=>RESULT_PER_PAGE);
 const API_URL = "https://forkify-api.herokuapp.com/api/v2/recipes";
 const TIMEOUT_SECS = 5;
+const RESULT_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -1108,7 +1110,65 @@ class ResultsView extends (0, _viewDefault.default) {
 }
 exports.default = new ResultsView();
 
-},{"./view":"4wVyX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
+},{"./view":"4wVyX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"9Reww":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _config = require("../config");
+class PaginationView {
+    _parentEl = document.querySelector(".pagination");
+    _btnPrev = document.querySelector(".pagination__btn--prev");
+    _btnNext = document.querySelector(".pagination__btn--next");
+    _currentPage;
+    _totalPages;
+    render(totalresults) {
+        const totalRecipeItems = totalresults.results;
+        this._currentPage = totalresults.page;
+        this._totalPages = Math.ceil(totalRecipeItems.length / (0, _config.RESULT_PER_PAGE));
+        this._controlPageButtons(this._currentPage, this._totalPages);
+    }
+    addHandleClick(handler) {
+        this._parentEl.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--inline");
+            if (!btn) return;
+            if (btn.classList.contains("pagination__btn--prev")) {
+                if (this._currentPage <= 1) return;
+                this._currentPage -= 1;
+            } else {
+                if (this._currentPage >= this._totalPages) return;
+                this._currentPage += 1;
+            }
+            this._controlPageButtons(this._currentPage, this._totalPages);
+            handler(this._currentPage);
+        });
+    }
+    _controlPageButtons(currentPage, totalPages) {
+        //if on first page and no more items left - hide both the btns
+        if (this._currentPage === 1 && this._totalPages <= 1) {
+            this._btnNext.classList.add("inactive");
+            this._btnPrev.classList.add("inactive");
+        }
+        //if on first page and more items - hide prev btn - show next btn
+        if (this._currentPage === 1 && this._totalPages > 1) {
+            this._btnPrev.classList.add("inactive");
+            this._btnNext.classList.remove("inactive");
+        }
+        //if on last page - show only prev button - hide next btn
+        if (this._currentPage > 1 && this._totalPages === currentPage) {
+            this._btnPrev.classList.remove("inactive");
+            this._btnNext.classList.add("inactive");
+        }
+        //if on any other page - show both the btns
+        if (this._currentPage > 1 && this._currentPage != this._totalPages) {
+            this._btnPrev.classList.remove("inactive");
+            this._btnNext.classList.remove("inactive");
+        }
+        this._btnNext.querySelector("span").textContent = `Page ${this._currentPage + 1}`;
+        this._btnPrev.querySelector("span").textContent = `Page ${this._currentPage - 1}`;
+    }
+}
+exports.default = new PaginationView();
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../config":"k5Hzs"}],"dXNgZ":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -1692,63 +1752,6 @@ try {
     else Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}],"9Reww":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-class PaginationView {
-    _parentEl = document.querySelector(".pagination");
-    _btnPrev = document.querySelector(".pagination__btn--prev");
-    _btnNext = document.querySelector(".pagination__btn--next");
-    _currentPage;
-    _totalPages;
-    render(totalresults) {
-        const totalRecipeItems = totalresults.results;
-        this._currentPage = totalresults.page;
-        this._totalPages = Math.ceil(totalRecipeItems.length / 10);
-        this._controlPageButtons(this._currentPage, this._totalPages);
-    }
-    addHandleClick(handler) {
-        this._parentEl.addEventListener("click", (e)=>{
-            const btn = e.target.closest(".btn--inline");
-            if (!btn) return;
-            if (btn.classList.contains("pagination__btn--prev")) {
-                if (this._currentPage <= 1) return;
-                this._currentPage -= 1;
-            } else {
-                if (this._currentPage >= this._totalPages) return;
-                this._currentPage += 1;
-            }
-            this._controlPageButtons(this._currentPage, this._totalPages);
-            handler(this._currentPage);
-        });
-    }
-    _controlPageButtons(currentPage, totalPages) {
-        //if on first page and no more items left - hide both the btns
-        if (this._currentPage === 1 && this._totalPages <= 1) {
-            this._btnNext.classList.add("inactive");
-            this._btnPrev.classList.add("inactive");
-        }
-        //if on first page and more items - hide prev btn - show next btn
-        if (this._currentPage === 1 && this._totalPages > 1) {
-            this._btnPrev.classList.add("inactive");
-            this._btnNext.classList.remove("inactive");
-        }
-        //if on last page - show only prev button - hide next btn
-        if (this._currentPage > 1 && this._totalPages === currentPage) {
-            this._btnPrev.classList.remove("inactive");
-            this._btnNext.classList.add("inactive");
-        }
-        //if on any other page - show both the btns
-        if (this._currentPage > 1 && this._currentPage != this._totalPages) {
-            this._btnPrev.classList.remove("inactive");
-            this._btnNext.classList.remove("inactive");
-        }
-        this._btnNext.querySelector("span").textContent = `Page ${this._currentPage + 1}`;
-        this._btnPrev.querySelector("span").textContent = `Page ${this._currentPage - 1}`;
-    }
-}
-exports.default = new PaginationView();
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kYpTN","aenu9"], "aenu9", "parcelRequire3a11")
+},{}]},["kYpTN","aenu9"], "aenu9", "parcelRequire3a11")
 
 //# sourceMappingURL=index.e37f48ea.js.map
