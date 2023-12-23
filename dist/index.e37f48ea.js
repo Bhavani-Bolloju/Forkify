@@ -594,7 +594,6 @@ var _runtime = require("regenerator-runtime/runtime");
 // }
 const controlRecipes = async function() {
     const id = window.location.hash.slice(1);
-    // console.log(id);
     if (!id) return;
     try {
         // load recipe
@@ -602,7 +601,10 @@ const controlRecipes = async function() {
         await _modelJs.loadRecipe(id);
         // render recipe
         const { recipe } = _modelJs.state;
+        // console.log(recipe);
         (0, _recipeViewJsDefault.default).render(recipe);
+    //sample check
+    // model.updateServings(8);
     } catch (error) {
         (0, _recipeViewJsDefault.default).renderError();
     }
@@ -631,8 +633,13 @@ const controlPagination = function(page) {
     (0, _resultsViewJsDefault.default).render(result);
     (0, _paginationViewJsDefault.default).render(_modelJs.state.search);
 };
+const controlServings = function(totalServings) {
+    _modelJs.updateServings(totalServings);
+    (0, _recipeViewJsDefault.default).render(_modelJs.state.recipe);
+};
 const init = function() {
     (0, _recipeViewJsDefault.default).handlerRender(controlRecipes);
+    (0, _recipeViewJsDefault.default).handleUpdateServings(controlServings);
     (0, _searchViewJsDefault.default).handlerSearchResult(controlSearchResults);
     (0, _paginationViewJsDefault.default).addHandleClick(controlPagination);
 };
@@ -645,6 +652,7 @@ parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
+parcelHelpers.export(exports, "updateServings", ()=>updateServings);
 var _config = require("./config");
 var _helper = require("./helper");
 const state = {
@@ -669,6 +677,7 @@ const loadRecipe = async function(id) {
             cookingTime: recipe?.cooking_time,
             servings: recipe?.servings
         };
+    // console.log(state.recipe);
     } catch (err) {
         throw err;
     }
@@ -694,6 +703,18 @@ const getSearchResultsPage = function(page = state.search.page) {
     const begin = (page - 1) * (0, _config.RESULT_PER_PAGE);
     const end = page * (0, _config.RESULT_PER_PAGE);
     return state.search.results.slice(begin, end);
+};
+const updateServings = function(servingsNum) {
+    const currentServings = state.recipe.servings;
+    const updateIngredients = state.recipe.ingredients.map((ing)=>{
+        const updateQty = ing.quantity / currentServings * servingsNum;
+        return {
+            ...ing,
+            quantity: updateQty
+        };
+    });
+    state.recipe.servings = servingsNum;
+    state.recipe.ingredients = updateIngredients;
 };
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -781,6 +802,15 @@ class RecipeView extends (0, _viewDefault.default) {
             "load"
         ].forEach((ev)=>window.addEventListener(ev, handler));
     }
+    handleUpdateServings(handler) {
+        this._parentEl.addEventListener("click", function(e) {
+            const btn = e.target.closest(".btn--tiny");
+            if (!btn) return;
+            const getCurrentServings = +btn.dataset.updateTo;
+            if (getCurrentServings <= 0) return;
+            handler(getCurrentServings);
+        });
+    }
     _generateMarkup() {
         return `
     <figure class="recipe__fig">
@@ -806,12 +836,15 @@ class RecipeView extends (0, _viewDefault.default) {
         <span class="recipe__info-text">servings</span>
 
         <div class="recipe__info-buttons">
-          <button class="btn--tiny btn--increase-servings">
+          <button 
+          class="btn--tiny btn--decrease-servings" data-update-to="${this._data?.servings - 1}" >
             <svg>
               <use href="${0, _iconsSvgDefault.default}#icon-minus-circle"></use>
             </svg>
           </button>
-          <button class="btn--tiny btn--increase-servings">
+          <button 
+          class="btn--tiny btn--increase-servings"
+          data-update-to="${this._data?.servings + 1}">
             <svg>
               <use href="${0, _iconsSvgDefault.default}#icon-plus-circle"></use>
             </svg>
@@ -820,7 +853,6 @@ class RecipeView extends (0, _viewDefault.default) {
       </div>
 
       <div class="recipe__user-generated">
-        
       </div>
       <button class="btn--round">
         <svg class="">
@@ -1168,7 +1200,7 @@ class PaginationView {
 }
 exports.default = new PaginationView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../config":"k5Hzs"}],"dXNgZ":[function(require,module,exports) {
+},{"../config":"k5Hzs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
