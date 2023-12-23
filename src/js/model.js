@@ -25,6 +25,8 @@ export const loadRecipe = async function (id) {
       cookingTime: recipe?.cooking_time,
       servings: recipe?.servings,
     };
+
+    // console.log(state.recipe);
   } catch (err) {
     throw err;
   }
@@ -52,4 +54,16 @@ export const getSearchResultsPage = function (page = state.search.page) {
   const begin = (page - 1) * RESULT_PER_PAGE;
   const end = page * RESULT_PER_PAGE;
   return state.search.results.slice(begin, end);
+};
+
+export const updateServings = function (servingsNum) {
+  const currentServings = state.recipe.servings;
+  const updateIngredients = state.recipe.ingredients.map(ing => {
+    const updateQty = (ing.quantity / currentServings) * servingsNum;
+    return { ...ing, quantity: updateQty };
+  });
+
+  state.recipe.servings = servingsNum;
+
+  state.recipe.ingredients = updateIngredients;
 };
