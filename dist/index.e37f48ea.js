@@ -596,15 +596,11 @@ const controlRecipes = async function() {
     const id = window.location.hash.slice(1);
     if (!id) return;
     try {
-        // load recipe
         (0, _recipeViewJsDefault.default).spinner();
         await _modelJs.loadRecipe(id);
-        // render recipe
+        (0, _resultsViewJsDefault.default).update(_modelJs.getSearchResultsPage());
         const { recipe } = _modelJs.state;
-        // console.log(recipe);
         (0, _recipeViewJsDefault.default).render(recipe);
-    //sample check
-    // model.updateServings(8);
     } catch (error) {
         (0, _recipeViewJsDefault.default).renderError();
     }
@@ -635,7 +631,8 @@ const controlPagination = function(page) {
 };
 const controlServings = function(totalServings) {
     _modelJs.updateServings(totalServings);
-    (0, _recipeViewJsDefault.default).render(_modelJs.state.recipe);
+    // recipeView.render(model.state.recipe);
+    (0, _recipeViewJsDefault.default).update(_modelJs.state.recipe);
 };
 const init = function() {
     (0, _recipeViewJsDefault.default).handlerRender(controlRecipes);
@@ -911,10 +908,34 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class View {
     _data;
     render(data) {
+        // if (!data || (Array.isArray(data) && data.length === 0)) {
+        //   return this.renderError();
+        // }
         this._data = data;
         const markup = this._generateMarkup();
         this._clear();
         this._parentEl.insertAdjacentHTML("afterbegin", markup);
+    }
+    update(data) {
+        // if (!data || (Array.isArray(data) && data.length === 0)) {
+        //   return this.renderError();
+        // }
+        this._data = data;
+        const newMarkup = this._generateMarkup();
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = [
+            ...newDOM.querySelectorAll("*")
+        ];
+        const currentElements = [
+            ...this._parentEl.querySelectorAll("*")
+        ];
+        newElements.forEach((newEl, i)=>{
+            const currEl = currentElements[i];
+            if (!newEl.isEqualNode(currEl) && newEl.firstChild?.nodeValue.trim() !== "") currEl.textContent = newEl.textContent;
+            if (!newEl.isEqualNode(currEl)) Array.from(newEl.attributes).forEach((attr)=>{
+                currEl.setAttribute(attr.name, attr.value);
+            });
+        });
     }
     _clear() {
         this._parentEl.innerHTML = "";
@@ -1122,10 +1143,12 @@ var _viewDefault = parcelHelpers.interopDefault(_view);
 class ResultsView extends (0, _viewDefault.default) {
     _parentEl = document.querySelector(".results");
     _generateMarkup() {
+        const id = window.location.hash.slice(1);
         return this._data.map((recipe)=>{
+            // console.log(recipe.id);
             return `
          <li class="preview">
-            <a class="preview__link " href="#${recipe.id}">
+            <a class="preview__link ${id === recipe.id && "preview__link--active"}" href="#${recipe.id}">
               <figure class="preview__fig">
                 <img src="${recipe.image}" alt="${recipe.title}" />
               </figure>
