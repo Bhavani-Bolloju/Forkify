@@ -601,6 +601,8 @@ const controlRecipes = async function() {
         (0, _resultsViewJsDefault.default).update(_modelJs.getSearchResultsPage());
         const { recipe } = _modelJs.state;
         (0, _recipeViewJsDefault.default).render(recipe);
+    //bookmarks
+    // recipeView.getBookmarksData(model.state.bookmarks);
     } catch (error) {
         (0, _recipeViewJsDefault.default).renderError();
     }
@@ -631,12 +633,16 @@ const controlPagination = function(page) {
 };
 const controlServings = function(totalServings) {
     _modelJs.updateServings(totalServings);
-    // recipeView.render(model.state.recipe);
+    (0, _recipeViewJsDefault.default).update(_modelJs.state.recipe);
+};
+const controlBookmarks = function() {
+    _modelJs.addBookMark(_modelJs.state.recipe.id);
     (0, _recipeViewJsDefault.default).update(_modelJs.state.recipe);
 };
 const init = function() {
     (0, _recipeViewJsDefault.default).handlerRender(controlRecipes);
     (0, _recipeViewJsDefault.default).handleUpdateServings(controlServings);
+    (0, _recipeViewJsDefault.default).handleBookmarks(controlBookmarks);
     (0, _searchViewJsDefault.default).handlerSearchResult(controlSearchResults);
     (0, _paginationViewJsDefault.default).addHandleClick(controlPagination);
 };
@@ -650,6 +656,7 @@ parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
 parcelHelpers.export(exports, "updateServings", ()=>updateServings);
+parcelHelpers.export(exports, "addBookMark", ()=>addBookMark);
 var _config = require("./config");
 var _helper = require("./helper");
 const state = {
@@ -658,7 +665,8 @@ const state = {
         results: [],
         query: "",
         page: 1
-    }
+    },
+    bookmarks: []
 };
 const loadRecipe = async function(id) {
     const data = await (0, _helper.getJson)(`${(0, _config.API_URL)}/${id}`);
@@ -674,7 +682,9 @@ const loadRecipe = async function(id) {
             cookingTime: recipe?.cooking_time,
             servings: recipe?.servings
         };
-    // console.log(state.recipe);
+        const idExists = state.bookmarks.includes(id);
+        if (idExists) state.recipe.bookmarked = true;
+        else state.recipe.bookmarked = false;
     } catch (err) {
         throw err;
     }
@@ -712,6 +722,19 @@ const updateServings = function(servingsNum) {
     });
     state.recipe.servings = servingsNum;
     state.recipe.ingredients = updateIngredients;
+};
+const addBookMark = function(recipeId) {
+    const bookmarks = state.bookmarks;
+    const idExists = bookmarks.includes(recipeId);
+    if (idExists) {
+        state.bookmarks = [
+            ...state.bookmarks
+        ].filter((id)=>id !== recipeId);
+        state.recipe.bookmarked = false;
+    } else {
+        state.bookmarks.push(recipeId);
+        state.recipe.bookmarked = true;
+    }
 };
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -808,7 +831,15 @@ class RecipeView extends (0, _viewDefault.default) {
             handler(getCurrentServings);
         });
     }
+    handleBookmarks(handler) {
+        this._parentEl.addEventListener("click", function(e) {
+            const btn = e.target.closest(".btn--bookmark");
+            if (!btn) return;
+            handler();
+        });
+    }
     _generateMarkup() {
+        const exists = this._data.bookmarked;
         return `
     <figure class="recipe__fig">
       <img src="${this._data?.image}" alt="${this._data?.title}" class="recipe__img" />
@@ -851,9 +882,9 @@ class RecipeView extends (0, _viewDefault.default) {
 
       <div class="recipe__user-generated">
       </div>
-      <button class="btn--round">
+      <button class="btn--round btn--bookmark">
         <svg class="">
-          <use href="${0, _iconsSvgDefault.default}#icon-bookmark-fill"></use>
+          <use href="${0, _iconsSvgDefault.default}${exists ? "#icon-bookmark-fill" : "#icon-bookmark"}"></use>
         </svg>
       </button>
     </div>
@@ -908,18 +939,12 @@ var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class View {
     _data;
     render(data) {
-        // if (!data || (Array.isArray(data) && data.length === 0)) {
-        //   return this.renderError();
-        // }
         this._data = data;
         const markup = this._generateMarkup();
         this._clear();
         this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
     update(data) {
-        // if (!data || (Array.isArray(data) && data.length === 0)) {
-        //   return this.renderError();
-        // }
         this._data = data;
         const newMarkup = this._generateMarkup();
         const newDOM = document.createRange().createContextualFragment(newMarkup);
