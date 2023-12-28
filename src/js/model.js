@@ -85,4 +85,18 @@ export const addBookMark = function (recipe) {
     state.bookmarks.push(recipe);
     state.recipe.bookmarked = true;
   }
+
+  //add to the local storage whenever recipe is bookmarked
+
+  const storeBookmarks = JSON.stringify(state.bookmarks);
+  localStorage.setItem("bookmarks", storeBookmarks);
 };
+
+const getStoredBookmarks = function () {
+  const getStoredBookmarks = localStorage.getItem("bookmarks");
+  const storedBookmarks = JSON.parse(getStoredBookmarks);
+
+  if (storedBookmarks?.length > 0) state.bookmarks = storedBookmarks;
+};
+
+getStoredBookmarks();
