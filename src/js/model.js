@@ -27,7 +27,7 @@ export const loadRecipe = async function (id) {
       servings: recipe?.servings,
     };
 
-    const idExists = state.bookmarks.includes(id);
+    const idExists = state.bookmarks.some(b => b.id === recipe.id);
 
     if (idExists) {
       state.recipe.bookmarked = true;
@@ -75,14 +75,14 @@ export const updateServings = function (servingsNum) {
   state.recipe.ingredients = updateIngredients;
 };
 
-export const addBookMark = function (recipeId) {
+export const addBookMark = function (recipe) {
   const bookmarks = state.bookmarks;
-  const idExists = bookmarks.includes(recipeId);
+  const idExists = bookmarks.some(b => b.id === recipe.id);
   if (idExists) {
-    state.bookmarks = [...state.bookmarks].filter(id => id !== recipeId);
+    state.bookmarks = [...state.bookmarks].filter(b => b.id !== recipe.id);
     state.recipe.bookmarked = false;
   } else {
-    state.bookmarks.push(recipeId);
+    state.bookmarks.push(recipe);
     state.recipe.bookmarked = true;
   }
 };
