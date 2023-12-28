@@ -604,8 +604,6 @@ const controlRecipes = async function() {
         (0, _bookmarksViewJsDefault.default).update(_modelJs.state.bookmarks);
         const { recipe } = _modelJs.state;
         (0, _recipeViewJsDefault.default).render(recipe);
-    //bookmarks
-    // recipeView.getBookmarksData(model.state.bookmarks);
     } catch (error) {
         (0, _recipeViewJsDefault.default).renderError();
     }
@@ -643,7 +641,13 @@ const controlBookmarks = function() {
     (0, _recipeViewJsDefault.default).update(_modelJs.state.recipe);
     (0, _bookmarksViewJsDefault.default).render(_modelJs.state.bookmarks);
 };
+const controlStoredBookmarks = function() {
+    // model.getStoredBookmarks();
+    const storedBookmarks = _modelJs.state.bookmarks;
+    if (storedBookmarks.length > 0) (0, _bookmarksViewJsDefault.default).render(storedBookmarks);
+};
 const init = function() {
+    (0, _bookmarksViewJsDefault.default).addBookmarksHandler(controlStoredBookmarks);
     (0, _recipeViewJsDefault.default).handlerRender(controlRecipes);
     (0, _recipeViewJsDefault.default).handleUpdateServings(controlServings);
     (0, _recipeViewJsDefault.default).handleBookmarks(controlBookmarks);
@@ -739,7 +743,16 @@ const addBookMark = function(recipe) {
         state.bookmarks.push(recipe);
         state.recipe.bookmarked = true;
     }
+    //add to the local storage whenever recipe is bookmarked
+    const storeBookmarks = JSON.stringify(state.bookmarks);
+    localStorage.setItem("bookmarks", storeBookmarks);
 };
+const getStoredBookmarks = function() {
+    const getStoredBookmarks = localStorage.getItem("bookmarks");
+    const storedBookmarks = JSON.parse(getStoredBookmarks);
+    if (storedBookmarks?.length > 0) state.bookmarks = storedBookmarks;
+};
+getStoredBookmarks();
 
 },{"./config":"k5Hzs","./helper":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -1859,6 +1872,9 @@ class BookmarksView extends (0, _viewDefault.default) {
     _parentEl = document.querySelector(".bookmarks__list");
     _errorMessage = "No bookmarks yet. Find a nice recipe and bookmark it";
     _message = "";
+    addBookmarksHandler(handler) {
+        window.addEventListener("load", handler);
+    }
     _generateMarkup() {
         return this._data.map((recipe)=>(0, _previewViewDefault.default).render(recipe, false)).join("");
     }
