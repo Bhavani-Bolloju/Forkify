@@ -34,7 +34,6 @@ class RecipeView extends View {
 
   _generateMarkup() {
     const exists = this._data.bookmarked;
-
     return `
     <figure class="recipe__fig">
       <img src="${this._data?.image}" alt="${
