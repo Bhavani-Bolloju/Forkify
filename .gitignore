@@ -12,7 +12,7 @@ node_modules/
 .env
 
 # ignore parcel-cache
-parcel-cache/
+.parcel-cache/
 
 # ignore build folder
 
