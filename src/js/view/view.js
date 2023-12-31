@@ -4,6 +4,11 @@ export default class View {
   _data;
   render(data, render = true) {
     this._data = data;
+
+    if (data.length <= 0) {
+      this.renderMessage();
+    }
+
     const markup = this._generateMarkup();
     if (!render) {
       return markup;
