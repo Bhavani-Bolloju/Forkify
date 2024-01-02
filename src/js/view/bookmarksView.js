@@ -4,7 +4,7 @@ import previewView from "./previewView";
 class BookmarksView extends View {
   _parentEl = document.querySelector(".bookmarks__list");
   _errorMessage = "No bookmarks yet. Find a nice recipe and bookmark it";
-  _message = "";
+  _message = "No bookmarks yet. Find a nice recipe and bookmark it";
 
   addBookmarksHandler(handler) {
     window.addEventListener("load", handler);
