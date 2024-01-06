@@ -112,34 +112,52 @@ getStoredBookmarks();
 
 export const uploadRecipes = async function (recipe) {
   try {
-    const filterIngredients = Object.entries(recipe)
-      .filter(
-        item => item[0].startsWith("ingredient") && item[1].trim("") !== ""
-      )
-      .map(item => {
-        const ing = item[1].split(",");
+    // console.log(recipe, "upload");
+    const ingredientsObj = new Map();
 
-        const [quantity = 0, unit = "", description = ""] = ing;
-
-        if (ing.length < 3) {
-          throw new Error(
-            "Please select correct format to upload recipe ingredients!!!"
-          );
+    for (const [name, value] of recipe) {
+      if (
+        name.startsWith("unit") ||
+        name.startsWith("quantity") ||
+        name.startsWith("descr")
+      ) {
+        const [desc, num] = name.split("-");
+        //check if key exist
+        if (ingredientsObj.has(num)) {
+          //if yes - modify
+          //get the key
+          const ing = ingredientsObj.get(num);
+          //modify
+          const modifyValue = {
+            ...ing,
+            [desc]: desc === "quantity" ? +value : value,
+          };
+          //set key
+          ingredientsObj.set(num, modifyValue);
+        } else {
+          //if no - create new obj
+          const ing = { [desc]: desc === "quantity" ? +value : value };
+          ingredientsObj.set(num, ing);
         }
+      }
+    }
+    // console.log(ingredientsObj);
+    const ingredientsArr = [...ingredientsObj].map(val => val[1]);
 
-        return { quantity: +quantity, unit, description };
-      });
+    const recipeEntries = Object.fromEntries(recipe);
+    // console.log(recipeEntries);
 
     const uploadData = {
-      publisher: recipe.publisher,
-      ingredients: filterIngredients,
-      source_url: recipe.sourceUrl,
-      image_url: recipe.image,
-      cooking_time: recipe.cookingTime,
-      servings: recipe.servings,
-      title: recipe.title,
+      publisher: recipeEntries.publisher,
+      ingredients: ingredientsArr,
+      source_url: recipeEntries.sourceUrl,
+      image_url: recipeEntries.image,
+      cooking_time: recipeEntries.cookingTime,
+      servings: recipeEntries.servings,
+      title: recipeEntries.title,
     };
 
+    // console.log(uploadData);
     const resData = await AJAX(`${API_URL}?key=${KEY}`, uploadData);
 
     const recipeData = resData?.data?.recipe;
@@ -151,3 +169,44 @@ export const uploadRecipes = async function (recipe) {
     throw error;
   }
 };
+// export const uploadRecipes = async function (recipe) {
+//   try {
+//     const filterIngredients = Object.entries(recipe)
+//       .filter(
+//         item => item[0].startsWith("ingredient") && item[1].trim("") !== ""
+//       )
+//       .map(item => {
+//         const ing = item[1].split(",");
+
+//         const [quantity = 0, unit = "", description = ""] = ing;
+
+//         if (ing.length < 3) {
+//           throw new Error(
+//             "Please select correct format to upload recipe ingredients!!!"
+//           );
+//         }
+
+//         return { quantity: +quantity, unit, description };
+//       });
+
+//     const uploadData = {
+//       publisher: recipe.publisher,
+//       ingredients: filterIngredients,
+//       source_url: recipe.sourceUrl,
+//       image_url: recipe.image,
+//       cooking_time: recipe.cookingTime,
+//       servings: recipe.servings,
+//       title: recipe.title,
+//     };
+
+//     const resData = await AJAX(`${API_URL}?key=${KEY}`, uploadData);
+
+//     const recipeData = resData?.data?.recipe;
+//     const data = formatRecipe(recipeData);
+
+//     state.recipe = data;
+//     addBookMark(data);
+//   } catch (error) {
+//     throw error;
+//   }
+// };

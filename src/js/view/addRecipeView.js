@@ -33,9 +33,18 @@ class AddRecipeView extends View {
   handlerUpload(handler) {
     this._parentEl.addEventListener("submit", function (e) {
       e.preventDefault();
+      // const ingFieldSets = this.querySelectorAll(".upload__column fieldset");
+
+      // console.log(ingFieldSets);
+      // console.log(...new FormData(ingFieldSets));
+
+      // console.log([...new FormData(ingFieldSets)]);
+      //
       const formArr = [...new FormData(this)];
-      const data = Object.fromEntries(formArr);
-      handler(data);
+      // console.log(formArr);
+      // const data = Object.fromEntries(formArr);
+      // console.log(data);
+      handler(formArr);
       // console.log(data, "form data");
     });
   }
