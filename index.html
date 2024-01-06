@@ -267,10 +267,10 @@
     <!-- upload new recipe form markup -->
 
     <div class="overlay hidden"></div>
-    <div class="add-recipe-window hidden">
+    <div class="add-recipe-window">
       <button class="btn--close-modal">&times;</button>
       <form class="upload" id="newrecipe">
-        <div class="upload__column">
+        <div class="upload__recipe">
           <h3 class="upload__heading">Recipe data</h3>
           <label>Title</label>
           <input value="TEST123" required name="title" type="text" />
@@ -286,11 +286,11 @@
           <input value="23" required name="servings" type="number" />
         </div>
 
-        <div class="upload__column">
+        <div class="upload__ingredients">
           <h3 class="upload__heading">Ingredients</h3>
           <fieldset form="newrecipe">
-            <legend>ingredient-1</legend>
-            <div>
+            <legend class="upload__subheading">ingredient-1</legend>
+            <div class="upload__inputs">
               <label for="description">description</label>
               <input
                 value="Rice"
@@ -300,7 +300,7 @@
                 placeholder="description"
               />
             </div>
-            <div>
+            <div class="upload__inputs">
               <label for="quantity">quantity</label>
               <input
                 value=".2"
@@ -310,7 +310,7 @@
                 placeholder="example: 0.2"
               />
             </div>
-            <div>
+            <div class="upload__inputs">
               <label for="unit">unit</label>
               <input
                 value=""
@@ -321,8 +321,8 @@
             </div>
           </fieldset>
           <fieldset form="newrecipe">
-            <legend>ingredient-2</legend>
-            <div>
+            <legend class="upload__subheading">ingredient-2</legend>
+            <div class="upload__inputs">
               <label for="description">description</label>
               <input
                 value="Rice"
@@ -332,7 +332,7 @@
                 placeholder="description"
               />
             </div>
-            <div>
+            <div class="upload__inputs">
               <label for="quantity">quantity</label>
               <input
                 value="5"
@@ -342,7 +342,7 @@
                 placeholder="example: 0.2"
               />
             </div>
-            <div>
+            <div class="upload__inputs">
               <label for="unit">unit</label>
               <input
                 value="cup"
