@@ -20,15 +20,14 @@ import "regenerator-runtime/runtime";
 
 const controlRecipes = async function () {
   const id = window.location.hash.slice(1);
-
   if (!id) return;
-
   try {
     recipeView.spinner();
     await model.loadRecipe(id);
     resultsView.update(model.getSearchResultsPage());
     bookmarksView.update(model.state.bookmarks);
     const { recipe } = model.state;
+    // console.log(recipe);
     recipeView.render(recipe);
   } catch (error) {
     recipeView.renderError();
